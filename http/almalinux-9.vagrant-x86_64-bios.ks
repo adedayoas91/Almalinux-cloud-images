@@ -1,8 +1,8 @@
 # AlmaLinux OS 9 kickstart file for Vagrant boxes with BIOS boot on x86_64
 
 url --url https://repo.almalinux.org/almalinux/9/BaseOS/x86_64/kickstart/
-repo --name=BaseOS --baseurl=https://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os/
-repo --name=AppStream --baseurl=https://repo.almalinux.org/almalinux/9/AppStream/x86_64/os/
+repo --name=BaseOS --baseurl=http://repo.rnd.ims.co.at/pulp/repos/alma/9.4-20240827/BaseOS/x86_64/os/
+repo --name=AppStream --baseurl=http://repo.rnd.ims.co.at/pulp/repos/alma/9.4-20240827/AppStream/x86_64/os/
 
 text
 skipx
@@ -24,8 +24,8 @@ reqpart
 part /boot --fstype=xfs --size=1024
 part / --fstype=xfs --grow
 
-rootpw vagrant
-user --name=vagrant --plaintext --password vagrant
+rootpw root
+user --name=root --plaintext --password root
 
 reboot --eject
 
@@ -53,8 +53,8 @@ usermode
 
 %post --erroronfail
 
-# allow vagrant user to run everything without a password
-echo "vagrant     ALL=(ALL)     NOPASSWD: ALL" >> /etc/sudoers.d/vagrant
+# allow root user to run everything without a password
+echo "root     ALL=(ALL)     NOPASSWD: ALL" >> /etc/sudoers.d/root
 
 # see Vagrant documentation (https://docs.vagrantup.com/v2/boxes/base.html)
 # for details about the requiretty.
