@@ -1,0 +1,282 @@
+---
+# misc variables alma-latest-vm
+
+hostname: "{{ release }}-latest-vm"
+
+users:
+  users:
+    - name: devel
+      comment: devel
+      uid: 5001
+      group: users
+      groups:
+        - wheel
+      home: /home/devel
+      shell: /bin/bash
+      password: "{{ user_devel_password }}"
+    - name: ims
+      comment: ims
+      uid: 5002
+      group: users
+      groups:
+      home: /home/ims
+      shell: /bin/bash
+      password: "{{ user_ims_password }}"
+
+packages:
+  - repo_id: alma-os
+    pkgs:
+      - emacs
+      - git
+      - haproxy
+      - httpd
+      - java-1.8.0-openjdk
+      - net-tools
+      - xorg-x11-xauth
+  - repo_id: ims-wscs-thirdparty
+    pkgs:
+      - mw-tools
+      - firefox-portable
+      - gssproxy
+      - libsecs
+      - miniconda-ims
+  - repo_id: ims-wscs
+    pkgs:
+      - configmgmt
+      - hvgui
+      - jobdeck-base
+      - netlib-http-proxy
+      - plugin-AIO-emu
+      - plugin-AlarmManager-emu
+      - plugin-BDC-emu
+      - plugin-CentralEventHub-emu
+      - plugin-Chat-emu
+      - plugin-Chiller-emu
+      - plugin-CSAIO-v3.4-emu
+      - plugin-CSCPUManager-v2.6-emu
+      - plugin-CSLDACMux-emu
+      - plugin-CSMMB-v4.4-emu
+      - plugin-CSMON-v2.6-emu
+      - plugin-CSMPole-emu
+      - plugin-CSMPoleWMB-emu
+      - plugin-CSWMB-emu
+      - plugin-CSXIO-v2.8-emu
+      - plugin-ErrorPLCIms-emu
+      - plugin-Exposure-emu
+      - plugin-Gauge-emu
+      - plugin-GaugeSNMP-emu
+      - plugin-HVControl-emu
+      - plugin-Ifm-emu
+      - plugin-JeolBase-emu
+      - plugin-MON-emu
+      - plugin-JEOLMoveGenerator-emu
+      - plugin-JeolStage-emu
+      - plugin-LDACMux-emu
+      - plugin-LogBook-emu
+      - plugin-MC78-emu
+      - plugin-MonitorPLC-emu
+      - plugin-MPole-emu
+      - plugin-Oszilloscope-emu
+      - plugin-PAmp-emu
+      - plugin-PIO-emu
+      - plugin-PIStage-emu
+      - plugin-PLC-emu
+      - plugin-PLCStates-emu
+      - plugin-ProbusV-emu
+      - plugin-ProbusVDevice-emu
+      - plugin-Psu-emu
+      - plugin-Pump-emu
+      - plugin-Ramper-emu
+      - plugin-Scanner-emu
+      - plugin-SECSGateway-emu
+      - plugin-SessionManager-emu
+      - plugin-SIF1k-emu
+      - plugin-SignalGenerator-emu
+      - plugin-SIOBusManager-emu
+      - plugin-Spu-emu
+      - plugin-Switch-emu
+      - plugin-TempStats-emu
+      - plugin-TopologyManager-emu
+      - plugin-Trom2Comm-emu
+      - plugin-TTY-emu
+      - plugin-Valve-emu
+      - plugin-VoltageStats-emu
+      - plugin-WcuCtrlTrom2-emu
+      - plugin-XIO-emu
+      - plugin-ZStats-emu
+      - program-GetEbmStatus-emu
+      - program-InterruptJob-emu
+      - program-ResumeJob-emu
+      - python3-blocks
+      - python3-blockrunner
+      - python3-configdb
+      - python3-configdb-updates
+      - python3-datapathcontroller
+      - python3-dbscripts
+      - python3-expses
+      - python3-hwsimuenv
+      - python3-integrationtests
+      - python3-jobdeck-generator
+      - python3-jobdeck-toolkit
+      - python3-jobqueue
+      - python3-jobqueue-client
+      - python3-jstage-eval
+      - python3-mirrormap
+      - python3-pygui
+      - python3-pyhwctrl
+      - python3-tec
+      - recorder-intervaller
+      - session-job-server
+      - subscription-service
+      - webapi-server
+      - webapp-*
+  - repo_id: elasticsearch
+    pkgs:
+      - elasticsearch
+  - repo_id: mongodb
+    pkgs:
+      - mongodb-org
+
+directories:
+  - owner: ims
+    group: users
+    mode: "0755"
+    dir_list:
+      - /home/ims/bin
+      - /home/ims/sandbox/jobdecks
+      - /home/ims/sandbox/jobdecks/jobdeck/test
+      - /home/ims/sandbox/jobdecks/jobdeck-base/data
+      - /home/ims/mongodb-scripts
+  - owner: ims
+    group: users
+    mode: "0700"
+    dir_list:
+      - /home/ims/.ssh
+  - owner: root
+    group: root
+    mode: "0755"
+    dir_list:
+      - /opt/web/
+      - /var/opt/session-job-server/
+      - /var/www/html/
+
+repo_files:
+  - host_dir: common
+    owner: ims
+    group: users
+    mode: "0644"
+    files:
+      - /home/ims/.Xauthority
+      - /home/ims/.ssh/id_rsa.pub
+      - /home/ims/.gitconfig
+      - /home/ims/sandbox/joblist.json
+      - /home/ims/mongodb-scripts/mongo_init_db.js
+  - host_dir: common
+    owner: ims
+    group: users
+    mode: "0600"
+    files:
+      - /home/ims/.ssh/id_rsa
+  - host_dir: common
+    owner: ims
+    group: users
+    mode: "0755"
+    files:
+      - /home/ims/bin/start_servers.sh
+      - /home/ims/bin/start_hvgui.sh
+  - host_dir: common
+    owner: root
+    group: root
+    mode: "0644"
+    files:
+      - /etc/mongod.conf
+      - /etc/hosts
+      - /etc/profile.d/env_miniconda.sh
+      - /etc/profile.d/env_control-pc.sh
+      - /etc/haproxy/haproxy.cfg
+      - /etc/httpd/conf/httpd.conf
+      - /etc/ims/session-job-server.yml
+      - /var/opt/session-job-server/syncState.yml
+      - /etc/systemd/system/session-job-server.service
+      - /etc/elasticsearch/elasticsearch.yml
+
+jobdecks:
+  - owner: ims
+    group: users
+    mode: "0644"
+    remote_src: "true"
+    remote_dir: "/opt/miniconda/envs/ims/lib/python3.10/site-packages/integrationtests"
+    dest: "/home/ims/sandbox/jobdecks/"
+  - owner: ims
+    group: users
+    mode: "0644"
+    remote_src: "true"
+    remote_dir: "/opt/miniconda/envs/ims/lib/python3.10/site-packages/jobdeck/tests/samples"
+    dest: "/home/ims/sandbox/jobdecks/jobdeck/tests/"
+  - owner: ims
+    group: users
+    mode: "0644"
+    remote_src: "true"
+    remote_dir: "/data/jobdeck-base/"
+    dest: "/home/ims/sandbox/jobdecks/jobdeck-base/data/"
+
+jobdecks_permissions:
+  - dest: "/home/ims/sandbox/jobdecks"
+    owner: ims
+    group: users
+    mode: "u=rwX,g=rX,o=rX"
+    recurse: yes
+
+simulation_active:
+  - simulation: "true"
+
+symlinks:
+  - owner: root
+    group: root
+    mode: "1777"
+    links:
+      - webapi-server
+      - webapp-server
+      - subscription-service
+      - netlib-http-proxy
+
+git_repositories:
+  - name: tool
+    user: ims
+    group: users
+    accept_hostkey: yes
+    key_file: "/home/ims/.ssh/id_rsa"
+    single_branch: yes
+    repo: "ssh://vbox@gerrit.rnd.ims.co.at:/software/tools"
+    dest: "/home/ims/sandbox/tool"
+    version: alpha-v20.6
+
+services:
+  - elasticsearch.service
+  - gssproxy.service
+  - haproxy.service
+  - httpd.service
+  - mongod.service
+  - session-job-server.service
+
+gensimuxml_script:
+  - user: ims
+    command: "sh /etc/profile.d/env_control-pc.sh && sh /etc/profile.d/env_miniconda.sh && /home/ims/bin/start_servers.sh --gensimuxml"
+
+simulation_files:
+  - host_dir: websrv
+    owner: root
+    group: root
+    mode: "0644"
+    files:
+      - /var/www/html/ims-logo.jpg
+      - /var/www/html/index.html
+      - /var/www/html/title-image.jpg
+
+mongodb_init:
+  - user: ims
+    command: "mongo /home/ims/mongodb-scripts/mongo_init_db.js"
+
+mongodb_script:
+  - user: ims
+    command: "init_logsrv_mongo.py --auth-data --webapi_server_cfg_path ~/sandbox/simulation/tool/system/websrv/etc/ims/webapi-server.yml --webapp_server_cfg_path ~/sandbox/simulation/tool/system/websrv/etc/ims/webapp-server.yml"

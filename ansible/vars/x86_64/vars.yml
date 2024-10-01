@@ -1,0 +1,62 @@
+# vars for x86 group
+
+rpm_repos:
+  - name: alma-appstream
+    description: Alma AppStream
+    enabled: yes
+    baseurl: "http://{{ pkgsrv }}/x86_64/alma/{{ alma }}/AppStream/x86_64/os"
+
+  - name: alma-baseos
+    description: Alma BaseOS
+    enabled: yes
+    baseurl: "http://{{ pkgsrv }}/x86_64/alma/{{ alma }}/BaseOS/x86_64/os"
+
+  - name: alma-crb
+    description: Alma CRB
+    enabled: yes
+    baseurl: "http://{{ pkgsrv }}/x86_64/alma/{{ alma }}/CRB/x86_64/os"
+
+  - name: alma-resilientstorage
+    description: Alma Resilient Storage
+    enabled: yes
+    baseurl: "http://{{ pkgsrv }}/x86_64/alma/{{ alma }}/ResilientStorage/x86_64/os"
+
+  - name: alma-epel
+    description: Alma epel
+    enabled: yes
+    baseurl: "http://{{ pkgsrv }}/x86_64/alma/{{ alma }}/epel/x86_64"
+
+  - name: alma-extras
+    description: Alma extras
+    enabled: yes
+    baseurl: "http://{{ pkgsrv }}/x86_64/alma/{{ alma }}/extras/x86_64/os"
+
+  - name: ims-wscs
+    description: IMS WSCS
+    enabled: yes
+    baseurl: "http://{{ pkgsrv }}/x86_64/ims/{{ release }}/ims-wscs"
+
+  - name: ims-wscs-thirdparty
+    description: IMS WSCS Thirdparty
+    enabled: yes
+    baseurl: "http://{{ pkgsrv }}/x86_64/ims/{{ release }}/ims-wscs-thirdparty"
+
+  - name: ims-dd
+    description: IMS DD
+    enabled: yes
+    baseurl: "http://{{ pkgsrv }}/x86_64/ims/{{ release }}/ims-dd"
+
+#  - name: mlnx-ofed
+#    description: Mellanox
+#    enabled: yes
+#    baseurl: "http://{{ pkgsrv }}/x86_64/mlnx-ofed/4.9-2.2.4.0/rhel7.9/x86_64/"
+
+  - name: mongodb
+    description: MongoDB
+    enabled: yes
+    baseurl: "http://{{ pkgsrv }}/x86_64/mongodb/rhel7/3.2/x86_64/"
+
+  - name: elasticsearch
+    description: Elasticsearch
+    enabled: yes
+    baseurl: "http://{{ pkgsrv }}/x86_64/elasticsearch/1.7/centos/x86_64/"

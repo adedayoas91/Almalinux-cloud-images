@@ -1,4 +1,3 @@
-
 variable "os_ver_9" {
   description = "AlmaLinux OS 9 version"
 
@@ -16,12 +15,8 @@ locals {
 }
 
 locals {
-  iso_url_9_x86_64       = "http://repo.rnd.ims.co.at/pulp/repos/alma/9.4-20240827/BaseOS/x86_64/os/images/boot.iso"
-  # iso_checksum_9_x86_64  = "file:https://repo.almalinux.org/almalinux/${var.os_ver_9}/isos/x86_64/CHECKSUM"
-  # iso_url_9_aarch64      = "https://repo.almalinux.org/almalinux/${var.os_ver_9}/isos/aarch64/AlmaLinux-${var.os_ver_9}-aarch64-boot.iso"
-  # iso_checksum_9_aarch64 = "file:https://repo.almalinux.org/almalinux/${var.os_ver_9}/isos/aarch64/CHECKSUM"
-  # iso_url_9_ppc64le      = "https://repo.almalinux.org/almalinux/${var.os_ver_9}/isos/ppc64le/AlmaLinux-${var.os_ver_9}-ppc64le-boot.iso"
-  # iso_checksum_9_ppc64le = "file:https://repo.almalinux.org/almalinux/${var.os_ver_9}/isos/ppc64le/CHECKSUM"
+  iso_url_9_x86_64       = "https://repo.almalinux.org/almalinux/${var.os_ver_9}/isos/x86_64/AlmaLinux-${var.os_ver_9}-x86_64-boot.iso"
+  iso_checksum_9_x86_64  = "file:https://repo.almalinux.org/almalinux/${var.os_ver_9}/isos/x86_64/CHECKSUM"
 }
 
 # Common
@@ -178,77 +173,77 @@ variable "vagrant_boot_command_9_aarch64" {
   ]
 }
 
-# Hyper-V
+# # Hyper-V
 
-variable "hyperv_switch_name" {
-  description = "The name of the switch to connect the virtual machine to"
+# variable "hyperv_switch_name" {
+#   description = "The name of the switch to connect the virtual machine to"
 
-  type    = string
-  default = null
-}
+#   type    = string
+#   default = null
+# }
 
-variable "do_spaces_key" {
-  description = "The access key used to communicate with Spaces"
+# variable "do_spaces_key" {
+#   description = "The access key used to communicate with Spaces"
 
-  sensitive = true
-  type      = string
-  default   = null
-}
+#   sensitive = true
+#   type      = string
+#   default   = null
+# }
 
-variable "do_spaces_secret" {
-  description = "The secret key used to communicate with Spaces"
+# variable "do_spaces_secret" {
+#   description = "The secret key used to communicate with Spaces"
 
-  sensitive = true
-  type      = string
-  default   = null
-}
+#   sensitive = true
+#   type      = string
+#   default   = null
+# }
 
-variable "do_spaces_region" {
-  description = "The name of the region, such as nyc3, in which to upload the image to Spaces"
+# variable "do_spaces_region" {
+#   description = "The name of the region, such as nyc3, in which to upload the image to Spaces"
 
-  sensitive = true
-  type      = string
-  default   = null
-}
+#   sensitive = true
+#   type      = string
+#   default   = null
+# }
 
-variable "do_space_name" {
-  description = "The name of the specific Space where the image file will be copied to for import"
+# variable "do_space_name" {
+#   description = "The name of the specific Space where the image file will be copied to for import"
 
-  type    = string
-  default = null
-}
+#   type    = string
+#   default = null
+# }
 
-variable "do_image_name_8" {
-  description = "The name to be used for the resulting DigitalOcean custom image"
+# variable "do_image_name_8" {
+#   description = "The name to be used for the resulting DigitalOcean custom image"
 
-  type    = string
-  default = null
-}
+#   type    = string
+#   default = null
+# }
 
-variable "do_image_name_9" {
-  description = "The name to be used for the resulting DigitalOcean custom image"
+# variable "do_image_name_9" {
+#   description = "The name to be used for the resulting DigitalOcean custom image"
 
-  type    = string
-  default = null
-}
+#   type    = string
+#   default = null
+# }
 
-variable "do_image_regions" {
-  description = "A list of DigitalOcean regions"
+# variable "do_image_regions" {
+#   description = "A list of DigitalOcean regions"
 
-  type    = list(string)
-  default = null
-}
+#   type    = list(string)
+#   default = null
+# }
 
-variable "do_image_description" {
-  description = "The description to set for the resulting imported image"
+# variable "do_image_description" {
+#   description = "The description to set for the resulting imported image"
 
-  type    = string
-  default = "Official AlmaLinux OS Image"
-}
+#   type    = string
+#   default = "Official AlmaLinux OS Image"
+# }
 
-variable "do_image_distribution" {
-  description = "The name of the distribution to set for the resulting imported image"
+# variable "do_image_distribution" {
+#   description = "The name of the distribution to set for the resulting imported image"
 
-  type    = string
-  default = "AlmaLinux OS"
-}
+#   type    = string
+#   default = "AlmaLinux OS"
+# }

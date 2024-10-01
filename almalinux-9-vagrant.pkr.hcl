@@ -2,7 +2,7 @@
 
 source "virtualbox-iso" "almalinux-9" {
   iso_url              = local.iso_url_9_x86_64
-  iso_checksum         = "b79079ad71cc3c5ceb3561fff348a1b67ee37f71f4cddfec09480d4589c191d6"
+  iso_checksum         = local.iso_checksum_9_x86_64
   http_directory       = var.http_directory
   shutdown_command     = var.vagrant_shutdown_command
   ssh_username         = var.vagrant_ssh_username
@@ -51,26 +51,30 @@ build {
   }
 
   provisioner "ansible" {
-    user                 = "vagrant"
-    use_proxy            = false
     galaxy_file          = "./ansible/requirements.yml"
     galaxy_force_install = true
     collections_path     = "./ansible/collections"
     roles_path           = "./ansible/roles"
-    playbook_file        = "./ansible/vagrant-box.yml"
+    playbook_file        = "./ansible/vbox-playbook.yml"    // vagrant-box.yml
     ansible_env_vars = [
       "ANSIBLE_PIPELINING=True",
       "ANSIBLE_REMOTE_TEMP=/tmp",
       "ANSIBLE_SCP_EXTRA_ARGS=-O",
-      "ANSIBLE_HOST_KEY_CHECKING=False",
     ]
     extra_arguments = [
       "--extra-vars",
-      "packer_provider=${source.type} ansible_ssh_pass=root",
+      "packer_provider=${source.type}",
     ]
-    only = ["hyperv-iso.almalinux-9"]
+    only = [
+      "qemu.almalinux-9",
+      "virtualbox-iso.almalinux-9",
+      "vmware-iso.almalinux-9",
+      "parallels-iso.almalinux-9",
+      "virtualbox-iso.almalinux-9-aarch64",
+      "vmware-iso.almalinux-9-aarch64",
+      "parallels-iso.almalinux-9-aarch64",
+    ]
   }
-
   post-processors {
 
     post-processor "vagrant" {

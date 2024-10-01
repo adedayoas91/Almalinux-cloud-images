@@ -1,0 +1,307 @@
+---
+
+- name: 'Provisioner'
+  hosts: default
+  remote_user: root  # specified specific user and made it root in next line
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Check Ansible version
+      assert:
+        that:
+          - ansible_version.major >= 2
+          - ansible_version.minor >= 12
+      tags:
+        - minimal
+        - system
+
+    - name: Inlcude vars
+      include_vars:
+        dir: ./vars/
+      tags:
+        - always
+
+    - name: Change hostname
+      hostname:
+        name: "{{ hostname }}"
+      tags:
+        - system
+
+    - name: Set timezone
+      timezone:
+        name: "{{ timezone }}"
+      tags:
+        - system
+
+    - name: Deactivate selinux
+      selinux:
+        state: disabled
+      tags:
+        - selinux
+        - security
+        - system
+
+    - name: Deactivate firewalld
+      systemd:
+        name: firewalld.service
+        enabled: false
+        state: stopped
+      tags:
+        - firewall
+        - security
+        - system
+
+    - name: Add users
+      user:
+        name: "{{ item.name }}"
+        comment: "{{ item.comment }}"
+        uid: "{{ item.uid }}"
+        group: "{{ item.group }}"
+        groups: "{{ item.groups }}"
+        home: "{{ item.home }}"
+        password: "{{ item.password }}"
+      with_items: "{{ users.users }}"
+      when: users.users is defined
+      tags:
+        - users
+
+    - name: Remove preinstalled repos
+      file:
+        path: /etc/yum.repos.d/{{ item }}
+        state: absent
+      with_items:
+        - CentOS-Base.repo
+        - CentOS-CR.repo
+        - CentOS-Debuginfo.repo
+        - CentOS-fasttrack.repo
+        - CentOS-Media.repo
+        - CentOS-Vault.repo
+        - CentOS-x86_64-kernel.repo
+        - CentOS-Sources.repo
+      tags:
+        - repo
+
+    - name: Add Yum Repositories
+      template:
+        src: "yum_repo.repo.j2"
+        dest: "/etc/yum.repos.d/{{ item.name }}.repo"
+        mode: "0644"
+        owner: root
+        group: root
+      with_items: "{{ rpm_repos }}"
+      tags:
+        - repo
+
+    - name: "Deactivate global yum gpgcheck"
+      ini_file:
+        path: /etc/yum.conf
+        mode: "0644"
+        section: main
+        option: gpgcheck
+        value: 0
+        no_extra_spaces: true
+      tags:
+        - repo
+
+    - name: "Update repository cache"  # noqa: command-instead-of-module
+      command:
+        cmd: "yum makecache"
+      changed_when: false
+      tags:
+        - repo
+        - cache
+
+    - name: Install packages
+      yum:
+        name: "{{ item.1 }}"
+        state: present
+        disable_gpg_check: true
+        exclude: webapp-blockrunner
+      with_subelements:
+        - "{{ packages }}"
+        - pkgs
+      tags:
+        - pkgs
+
+    - name: Create directories
+      file:
+        path: "{{ item.1 }}"
+        state: directory
+        mode: "{{ item.0.mode }}"
+        owner: "{{ item.0.owner }}"
+        group: "{{ item.0.group }}"
+      with_subelements:
+        - "{{ directories }}"
+        - dir_list
+      when: directories is defined
+      tags:
+        - files
+        - directories
+
+    - name: Copy files from vbox repo
+      copy:
+        src: "./system/{{ item.0.host_dir }}/{{ item.1 }}"
+        dest: "/{{ item.1 }}"
+        mode: "{{ item.0.mode }}"
+        owner: "{{ item.0.owner }}"
+        group: "{{ item.0.group }}"
+        force: "{{ item.0.force | default('yes') }}"
+      with_subelements:
+        - "{{ repo_files }}"
+        - files
+      when: repo_files is defined
+      tags:
+        - files
+        - repo_files
+
+    # - name: Create joblist file
+    #   copy:
+    #     path: "/home/ims/sandbox/jobdecks/joblist.json"
+    #     state: touch
+    #     mode: "0644"
+    #   tags:
+    #     - jobdecks
+
+    - name: Create git repository
+      become: true
+      become_method: ansible.builtin.su
+      become_user: "{{ item.user }}"
+      git:
+        accept_hostkey: "{{ item.accept_hostkey }}"
+        key_file: "{{ item.key_file|default(omit) }}"
+        single_branch: "{{ item.single_branch }}"
+        repo: "{{ item.repo }}"
+        dest: "{{ item.dest }}"
+        version: "{{ item.version }}"
+        refspec: "{{ item.refspec|default(omit) }}"
+        recursive: "{{ item.recursive|default(omit) }}"
+      with_items: "{{ git_repositories }}"
+      tags:
+        - git_repo
+
+    - name: Copy Jobdecks
+      copy:
+        src: "{{ item.remote_dir }}"
+        remote_src: "{{ item.remote_src }}"
+        dest: "{{ item.dest }}"
+        mode: "{{ item.mode }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+      with_items: "{{ jobdecks }}"
+      tags:
+        - jobdecks
+
+    - name: Change jobdecks permissions
+      file:
+        dest: "{{ item.dest }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+        recurse: "{{ item.recurse }}"
+      with_items: "{{ jobdecks_permissions }}"
+      tags:
+        - jobdecks
+
+    - name: Enable simulation in tec.xml
+      template:
+        src: "tec.j2"
+        dest: "/home/ims/sandbox/tool/system/tecsrv/etc/ims/tec.xml"
+        mode: "0644"
+        owner: ims
+        group: users
+      with_items: "{{ simulation_active }}"
+      tags:
+        - git_repo
+
+    - name: Start and enable service
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: true
+      with_items: "{{ services }}"
+      tags:
+        - services
+
+    - name: Create symlinks
+      file:
+        src: "/opt/{{ item.1 }}"
+        dest: "/opt/web/{{ item.1 }}"
+        owner: "{{ item.0.owner }}"
+        group: "{{ item.0.group }}"
+        mode: "{{ item.0.mode }}"
+        state: link
+      with_subelements:
+        - "{{ symlinks }}"
+        - links
+      when: symlinks is defined
+      ignore_errors: true
+      tags:
+        - files
+        - sym_links
+
+    - name: Generate simulation folder
+      become: true
+      become_method: ansible.builtin.su
+      become_flags: "--login"
+      become_user: "{{ item.user }}"
+      shell: "{{ item.command }}"
+      with_items: "{{ gensimuxml_script }}"
+      tags:
+        - gen_simu
+
+    - name: Wait for simulation to be generated
+      wait_for:
+        timeout: 120
+      tags:
+        - gen_simu
+
+    - name: Reboot
+      reboot:
+      tags:
+        - reboot
+
+    - name: Copy files from simulation folder
+      copy:
+        src: "/home/ims/sandbox/simulation/tool/system/{{ item.0.host_dir }}/{{ item.1 }}"
+        dest: "/{{ item.1 }}"
+        mode: "{{ item.0.mode }}"
+        owner: "{{ item.0.owner }}"
+        group: "{{ item.0.group }}"
+        force: "{{ item.0.force | default('yes') }}"
+        remote_src: true
+      with_subelements:
+        - "{{ simulation_files }}"
+        - files
+      when: simulation_files is defined
+      tags:
+        - gen_simu
+        - files
+        - simu_files
+
+    - name: Initialize mongodb
+      become: true
+      become_method: su
+      become_user: "{{ item.user }}"
+      command: "{{ item.command }}"
+      with_items: "{{ mongodb_init }}"
+      ignore_errors: true
+      tags:
+        - mongo
+
+    - name: Populate mongodb
+      become: true
+      become_method: su
+      become_user: "{{ item.user }}"
+      command: "{{ item.command }}"
+      with_items: "{{ mongodb_script }}"
+      ignore_errors: true
+      tags:
+        - mongo
+
+    - name: "Yum distribution synchronization"  # noqa: command-instead-of-module
+      command:
+        cmd: "yum distro-sync -y full"
+      when: not ansible_check_mode
+      tags:
+        - pkgs

@@ -1,0 +1,8 @@
+# vars for all groups
+
+release: almaBox
+alma: 9.4-20240827
+tool: vbox
+timezone: Europe/Vienna
+pkgsrv: srv-pkg-01
+customer_name: ims
